@@ -35,7 +35,7 @@
     {
       "id": "T001",
       "title": "Initialize backend solution and core projects",
-      "status": "blocked",
+      "status": "completed",
       "category": "bootstrap",
       "acceptanceCriteria": [
         "Create backend/Hrms.sln",
@@ -47,7 +47,7 @@
         "dotnet restore backend/Hrms.sln",
         "dotnet build backend/Hrms.sln"
       ],
-      "notes": "2026-03-30: Attempted required verification commands for T001, but dotnet SDK is unavailable in this environment (`dotnet: command not found`). Unable to validate restore/build."
+      "notes": "2026-03-30: Local Windows verification completed for T001. `dotnet restore backend/Hrms.sln` succeeded and `dotnet test backend/Hrms.sln` succeeded with 4/4 tests passing (0 failed). Build completed successfully in the same run, so T001 acceptance criteria are satisfied."
     },
     {
       "id": "T002",

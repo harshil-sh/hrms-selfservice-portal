@@ -71,7 +71,7 @@ function Invoke-RepoCommand {
 
 function Get-TasksData {
     Ensure-FileExists $TasksFile
-    return (Get-Content -Path $TasksFile -Raw | ConvertFrom-Json -Depth 100)
+    return (Get-Content -Path $TasksFile -Raw | ConvertFrom-Json)
 }
 
 function Save-TasksData {

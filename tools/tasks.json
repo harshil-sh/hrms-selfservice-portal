@@ -47,7 +47,7 @@
         "dotnet restore backend/Hrms.sln",
         "dotnet build backend/Hrms.sln"
       ],
-      "notes": "2026-03-30: Attempted required verification commands for T001, but dotnet SDK is unavailable in this environment (`dotnet: command not found`). Unable to validate restore/build."
+      "notes": "2026-03-30: Attempted required verification commands for T001, but dotnet SDK is unavailable in this environment (`dotnet: command not found`). Unable to validate restore/build.\n2026-03-30: Re-ran T001 verification (`dotnet restore backend/Hrms.sln && dotnet build backend/Hrms.sln`); environment still lacks .NET SDK (`dotnet: command not found`). Task remains blocked pending SDK availability."
     },
     {
       "id": "T002",

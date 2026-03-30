@@ -1,3 +1,5 @@
+using Xunit;
+
 namespace Hrms.Infrastructure.Tests;
 
 public sealed class SanityTests

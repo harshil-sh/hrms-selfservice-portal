@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace Hrms.Application.Common.Abstractions;
 
 public interface IApplicationDbContext

@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+TestResults/
+node_modules/
+dist/
+.env
+.codex-runner/
+*.user
+*.suo

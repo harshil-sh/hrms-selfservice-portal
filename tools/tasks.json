@@ -1,0 +1,635 @@
+{
+  "version": 1,
+  "project": {
+    "name": "hrms-selfservice-portal",
+    "displayName": "HRMS Self-Service Portal",
+    "repository": "https://github.com/harshil-sh/hrms-selfservice-portal.git",
+    "runnerMode": "sequential-first-incomplete",
+    "taskCompletionRule": "Task is completed only when relevant automated tests pass and tasks.json is updated in the same commit."
+  },
+  "executionPolicy": {
+    "readBeforeEachTask": [
+      "README.md",
+      "AGENTS.md",
+      "docs/architecture.md",
+      "docs/development-standards.md",
+      "docs/testing-strategy.md",
+      "docs/api-scope.md",
+      "docs/TASKS.md",
+      "tools/tasks.json"
+    ],
+    "allowedStatuses": [
+      "pending",
+      "in_progress",
+      "blocked",
+      "completed"
+    ],
+    "completeOnlyIfTestsPass": true,
+    "updateTasksJsonAfterEachTask": true,
+    "includeTasksJsonInCommit": true,
+    "pushTasksJsonToRemote": true,
+    "singleTaskPerRun": true,
+    "stopAfterFirstIncompleteTask": true
+  },
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "Initialize backend solution and core projects",
+      "status": "pending",
+      "category": "bootstrap",
+      "acceptanceCriteria": [
+        "Create backend/Hrms.sln",
+        "Create projects: Hrms.Domain, Hrms.Application, Hrms.Infrastructure, Hrms.API",
+        "Create test projects: Hrms.Domain.Tests, Hrms.Application.Tests, Hrms.Infrastructure.Tests, Hrms.API.Tests",
+        "All projects restore and build"
+      ],
+      "testCommands": [
+        "dotnet restore backend/Hrms.sln",
+        "dotnet build backend/Hrms.sln"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T002",
+      "title": "Configure project references to enforce Clean Architecture",
+      "status": "pending",
+      "category": "bootstrap",
+      "acceptanceCriteria": [
+        "Project references follow documented layer rules",
+        "API references Application and Infrastructure only for composition root",
+        "Application references Domain only",
+        "Infrastructure references Application and Domain"
+      ],
+      "testCommands": [
+        "dotnet build backend/Hrms.sln"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T003",
+      "title": "Add shared build settings and code style files",
+      "status": "pending",
+      "category": "bootstrap",
+      "acceptanceCriteria": [
+        "Add .editorconfig",
+        "Add backend/Directory.Build.props",
+        "Enable nullable and treat warnings intentionally",
+        "Repository builds successfully"
+      ],
+      "testCommands": [
+        "dotnet build backend/Hrms.sln"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T004",
+      "title": "Bootstrap frontend with Vite React TypeScript and Tailwind",
+      "status": "pending",
+      "category": "bootstrap",
+      "acceptanceCriteria": [
+        "Create frontend app with Vite and React 18",
+        "Configure TypeScript strict mode",
+        "Configure Tailwind CSS",
+        "npm run build passes"
+      ],
+      "testCommands": [
+        "cd frontend && npm install",
+        "cd frontend && npm run build"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T005",
+      "title": "Add Docker Compose with SQL Server service",
+      "status": "pending",
+      "category": "bootstrap",
+      "acceptanceCriteria": [
+        "Create docker-compose.yml with SQL Server service",
+        "Add named volume for SQL Server data",
+        "Expose default SQL Server port for local development",
+        "Document startup command in README or docs"
+      ],
+      "testCommands": [
+        "docker compose config"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T006",
+      "title": "Create core domain entities and enums",
+      "status": "pending",
+      "category": "domain",
+      "acceptanceCriteria": [
+        "Add core entities: User, RefreshToken, LeaveBalance, LeaveRequest, Payslip, AuditLog",
+        "Add enums for UserRole and LeaveStatus",
+        "Domain project contains no infrastructure dependencies"
+      ],
+      "testCommands": [
+        "dotnet build backend/Hrms.sln",
+        "dotnet test backend/tests/Hrms.Domain.Tests/Hrms.Domain.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T007",
+      "title": "Create EF Core DbContext and entity configurations",
+      "status": "pending",
+      "category": "infrastructure",
+      "acceptanceCriteria": [
+        "Add ApplicationDbContext in Infrastructure",
+        "Add entity type configuration classes",
+        "Wire DbContext into DI registration",
+        "Backend builds successfully"
+      ],
+      "testCommands": [
+        "dotnet build backend/Hrms.sln",
+        "dotnet test backend/tests/Hrms.Infrastructure.Tests/Hrms.Infrastructure.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T008",
+      "title": "Add initial migration and database startup instructions",
+      "status": "pending",
+      "category": "infrastructure",
+      "acceptanceCriteria": [
+        "Create initial EF migration",
+        "Infrastructure supports applying migration",
+        "Startup instructions documented"
+      ],
+      "testCommands": [
+        "dotnet build backend/Hrms.sln"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T009",
+      "title": "Implement seed data for local development",
+      "status": "pending",
+      "category": "infrastructure",
+      "acceptanceCriteria": [
+        "Seed at least one Employee, one Manager, and one HRAdmin user",
+        "Seed realistic leave balance data",
+        "Seed data is safe for local development only"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.Infrastructure.Tests/Hrms.Infrastructure.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T010",
+      "title": "Add foundational repository and service abstractions",
+      "status": "pending",
+      "category": "application",
+      "acceptanceCriteria": [
+        "Add Application interfaces required for auth, leave, payslip, audit, and storage use cases",
+        "Avoid meaningless pass-through abstractions",
+        "Application builds cleanly"
+      ],
+      "testCommands": [
+        "dotnet build backend/Hrms.sln"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T011",
+      "title": "Implement password hashing service with BCrypt",
+      "status": "pending",
+      "category": "auth",
+      "acceptanceCriteria": [
+        "Hash passwords with BCrypt",
+        "Verify password hashes via service abstraction",
+        "No plaintext password logging or storage"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.Infrastructure.Tests/Hrms.Infrastructure.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T012",
+      "title": "Implement JWT token generation service",
+      "status": "pending",
+      "category": "auth",
+      "acceptanceCriteria": [
+        "Generate short-lived access tokens",
+        "Include user id, employee code, and role claims",
+        "Configuration is driven by app settings"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.Infrastructure.Tests/Hrms.Infrastructure.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T013",
+      "title": "Implement refresh token persistence and rotation logic",
+      "status": "pending",
+      "category": "auth",
+      "acceptanceCriteria": [
+        "Persist refresh tokens server-side",
+        "Revoke old token when refreshed",
+        "Issue replacement refresh token",
+        "Rotation behavior is covered by tests"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.Application.Tests/Hrms.Application.Tests.csproj",
+        "dotnet test backend/tests/Hrms.Infrastructure.Tests/Hrms.Infrastructure.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T014",
+      "title": "Build login refresh and logout endpoints",
+      "status": "pending",
+      "category": "auth",
+      "acceptanceCriteria": [
+        "Add login endpoint",
+        "Add refresh endpoint",
+        "Add logout endpoint",
+        "Endpoints return appropriate status codes and payloads"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.API.Tests/Hrms.API.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T015",
+      "title": "Add RBAC policies and auth middleware wiring",
+      "status": "pending",
+      "category": "auth",
+      "acceptanceCriteria": [
+        "Configure JWT bearer authentication",
+        "Register role-based authorization policies",
+        "Secure relevant endpoints by role"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.API.Tests/Hrms.API.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T016",
+      "title": "Add auth unit and integration tests",
+      "status": "pending",
+      "category": "auth",
+      "acceptanceCriteria": [
+        "Cover login success/failure",
+        "Cover refresh token rotation",
+        "Cover unauthorized and forbidden access paths"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.Application.Tests/Hrms.Application.Tests.csproj",
+        "dotnet test backend/tests/Hrms.API.Tests/Hrms.API.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T017",
+      "title": "Build frontend auth flow and protected routing",
+      "status": "pending",
+      "category": "frontend-auth",
+      "acceptanceCriteria": [
+        "Add login page",
+        "Persist session/auth state",
+        "Protect routes by authentication",
+        "Add role-aware navigation baseline"
+      ],
+      "testCommands": [
+        "cd frontend && npm run build",
+        "cd frontend && npm run test"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T018",
+      "title": "Add frontend auth tests",
+      "status": "pending",
+      "category": "frontend-auth",
+      "acceptanceCriteria": [
+        "Test login form behavior",
+        "Test protected route redirect",
+        "Test role-aware rendering where implemented"
+      ],
+      "testCommands": [
+        "cd frontend && npm run test"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T019",
+      "title": "Model leave balances and leave requests",
+      "status": "pending",
+      "category": "leave",
+      "acceptanceCriteria": [
+        "Finalize leave-related entities and rules",
+        "Represent leave request status transitions clearly",
+        "Domain tests cover invariant logic"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.Domain.Tests/Hrms.Domain.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T020",
+      "title": "Implement leave submission command with validation",
+      "status": "pending",
+      "category": "leave",
+      "acceptanceCriteria": [
+        "Employee can submit leave request",
+        "Validator enforces required fields and date rules",
+        "Application test covers successful submission"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.Application.Tests/Hrms.Application.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T021",
+      "title": "Implement overlap validation and balance checks",
+      "status": "pending",
+      "category": "leave",
+      "acceptanceCriteria": [
+        "Reject overlapping leave requests",
+        "Reject requests exceeding available balance where implemented",
+        "Tests cover overlap and insufficient balance rules"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.Domain.Tests/Hrms.Domain.Tests.csproj",
+        "dotnet test backend/tests/Hrms.Application.Tests/Hrms.Application.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T022",
+      "title": "Implement approval and rejection commands",
+      "status": "pending",
+      "category": "leave",
+      "acceptanceCriteria": [
+        "Manager or HRAdmin can approve request",
+        "Manager or HRAdmin can reject request",
+        "Decision updates status and reviewer metadata"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.Application.Tests/Hrms.Application.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T023",
+      "title": "Build leave API endpoints",
+      "status": "pending",
+      "category": "leave",
+      "acceptanceCriteria": [
+        "Expose endpoints for submit, mine, pending approvals, approve, reject, and balance",
+        "Endpoints enforce auth and role constraints"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.API.Tests/Hrms.API.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T024",
+      "title": "Add leave backend tests",
+      "status": "pending",
+      "category": "leave",
+      "acceptanceCriteria": [
+        "Unit and/or integration tests cover leave happy path and rejection rules",
+        "Relevant API tests pass"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.Domain.Tests/Hrms.Domain.Tests.csproj",
+        "dotnet test backend/tests/Hrms.Application.Tests/Hrms.Application.Tests.csproj",
+        "dotnet test backend/tests/Hrms.API.Tests/Hrms.API.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T025",
+      "title": "Build leave frontend pages and forms",
+      "status": "pending",
+      "category": "frontend-leave",
+      "acceptanceCriteria": [
+        "Employee can view own leave requests",
+        "Employee can submit leave request",
+        "Manager or HRAdmin can view pending approvals",
+        "Approval actions wired to API client"
+      ],
+      "testCommands": [
+        "cd frontend && npm run build",
+        "cd frontend && npm run test"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T026",
+      "title": "Add leave frontend tests",
+      "status": "pending",
+      "category": "frontend-leave",
+      "acceptanceCriteria": [
+        "Test leave request form validation",
+        "Test pending approvals rendering",
+        "Test approval/rejection interaction states"
+      ],
+      "testCommands": [
+        "cd frontend && npm run test"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T027",
+      "title": "Implement payslip metadata model and storage abstraction",
+      "status": "pending",
+      "category": "payslip",
+      "acceptanceCriteria": [
+        "Add payslip metadata persistence model",
+        "Add file storage abstraction for PDF handling",
+        "Backend builds cleanly"
+      ],
+      "testCommands": [
+        "dotnet build backend/Hrms.sln",
+        "dotnet test backend/tests/Hrms.Infrastructure.Tests/Hrms.Infrastructure.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T028",
+      "title": "Implement HRAdmin upload use case",
+      "status": "pending",
+      "category": "payslip",
+      "acceptanceCriteria": [
+        "HRAdmin can upload payslip PDF metadata and file",
+        "Only PDF files are accepted for MVP",
+        "Audit event is prepared or recorded per design"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.Application.Tests/Hrms.Application.Tests.csproj",
+        "dotnet test backend/tests/Hrms.API.Tests/Hrms.API.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T029",
+      "title": "Implement employee download authorization use case",
+      "status": "pending",
+      "category": "payslip",
+      "acceptanceCriteria": [
+        "Employee can download own payslip",
+        "Employee cannot download another employee's payslip",
+        "Authorization behavior is tested"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.Application.Tests/Hrms.Application.Tests.csproj",
+        "dotnet test backend/tests/Hrms.API.Tests/Hrms.API.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T030",
+      "title": "Add audit logging for payslip upload and download",
+      "status": "pending",
+      "category": "payslip",
+      "acceptanceCriteria": [
+        "Upload and download actions create audit entries",
+        "Audit contains actor, action, entity, and timestamp"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.Application.Tests/Hrms.Application.Tests.csproj",
+        "dotnet test backend/tests/Hrms.Infrastructure.Tests/Hrms.Infrastructure.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T031",
+      "title": "Build payslip API endpoints",
+      "status": "pending",
+      "category": "payslip",
+      "acceptanceCriteria": [
+        "Add upload endpoint",
+        "Add list-my-payslips endpoint",
+        "Add download endpoint",
+        "Role and ownership rules are enforced"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.API.Tests/Hrms.API.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T032",
+      "title": "Add payslip backend tests",
+      "status": "pending",
+      "category": "payslip",
+      "acceptanceCriteria": [
+        "Cover HRAdmin upload path",
+        "Cover authorized employee download path",
+        "Cover unauthorized access path",
+        "Cover audit behavior"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.Application.Tests/Hrms.Application.Tests.csproj",
+        "dotnet test backend/tests/Hrms.API.Tests/Hrms.API.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T033",
+      "title": "Build payslip frontend pages",
+      "status": "pending",
+      "category": "frontend-payslip",
+      "acceptanceCriteria": [
+        "Employee can list own payslips",
+        "Employee can trigger download",
+        "HRAdmin has upload page and form"
+      ],
+      "testCommands": [
+        "cd frontend && npm run build",
+        "cd frontend && npm run test"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T034",
+      "title": "Add payslip frontend tests",
+      "status": "pending",
+      "category": "frontend-payslip",
+      "acceptanceCriteria": [
+        "Test payslip list rendering",
+        "Test HRAdmin upload form behavior",
+        "Test role-based visibility"
+      ],
+      "testCommands": [
+        "cd frontend && npm run test"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T035",
+      "title": "Add global exception handling and problem details responses",
+      "status": "pending",
+      "category": "cross-cutting",
+      "acceptanceCriteria": [
+        "Unhandled exceptions are translated to safe API responses",
+        "Validation and not-found cases are surfaced consistently",
+        "API tests cover representative failure cases"
+      ],
+      "testCommands": [
+        "dotnet test backend/tests/Hrms.API.Tests/Hrms.API.Tests.csproj"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T036",
+      "title": "Improve Swagger and OpenAPI metadata",
+      "status": "pending",
+      "category": "cross-cutting",
+      "acceptanceCriteria": [
+        "JWT bearer auth documented in Swagger",
+        "High-value endpoints have useful summaries",
+        "Examples added where practical"
+      ],
+      "testCommands": [
+        "dotnet build backend/Hrms.sln"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T037",
+      "title": "Add developer onboarding polish and sample configuration docs",
+      "status": "pending",
+      "category": "cross-cutting",
+      "acceptanceCriteria": [
+        "Document local setup and startup commands",
+        "Add sample configuration guidance",
+        "README and docs are consistent"
+      ],
+      "testCommands": [
+        "dotnet build backend/Hrms.sln",
+        "cd frontend && npm run build"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T038",
+      "title": "Final regression run and documentation pass",
+      "status": "pending",
+      "category": "cross-cutting",
+      "acceptanceCriteria": [
+        "Backend test suite passes",
+        "Frontend test suite passes",
+        "Documentation reflects final MVP"
+      ],
+      "testCommands": [
+        "dotnet test backend/Hrms.sln",
+        "cd frontend && npm run test",
+        "cd frontend && npm run build"
+      ],
+      "notes": ""
+    }
+  ]
+}

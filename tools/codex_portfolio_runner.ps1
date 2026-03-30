@@ -28,6 +28,7 @@ if ([string]::IsNullOrWhiteSpace($RunnerLogFile)) {
 
 function Write-Log {
     param([string]$Message)
+
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     $line = "$timestamp | $Message"
     Write-Host $line
@@ -36,6 +37,7 @@ function Write-Log {
 
 function Ensure-FileExists {
     param([string]$PathToCheck)
+
     if (-not (Test-Path $PathToCheck)) {
         throw "Required file not found: $PathToCheck"
     }
@@ -50,14 +52,16 @@ function Invoke-RepoCommand {
     Push-Location $WorkingDirectory
     try {
         Write-Log "RUN $Command"
+
         if ($IsWindows) {
-            & powershell -NoProfile -ExecutionPolicy Bypass -Command $Command
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -Command $Command
         }
         else {
             & pwsh -NoProfile -Command $Command
         }
+
         if ($LASTEXITCODE -ne 0) {
-            throw "Command failed with exit code $LASTEXITCODE: $Command"
+            throw "Command failed with exit code ${LASTEXITCODE}: $Command"
         }
     }
     finally {
@@ -67,22 +71,25 @@ function Invoke-RepoCommand {
 
 function Get-TasksData {
     Ensure-FileExists $TasksFile
-    return Get-Content $TasksFile -Raw | ConvertFrom-Json -Depth 100
+    return (Get-Content -Path $TasksFile -Raw | ConvertFrom-Json -Depth 100)
 }
 
 function Save-TasksData {
     param($TasksData)
+
     $json = $TasksData | ConvertTo-Json -Depth 100
     Set-Content -Path $TasksFile -Value $json -Encoding UTF8
 }
 
 function Get-FirstIncompleteTask {
     param($TasksData)
+
     foreach ($task in $TasksData.tasks) {
         if ($task.status -ne "completed") {
             return $task
         }
     }
+
     return $null
 }
 
@@ -107,12 +114,14 @@ function Update-Task {
 
 function Get-GitPorcelain {
     param([string]$Root)
+
     Push-Location $Root
     try {
-        $output = git status --porcelain
+        $output = @(git status --porcelain 2>$null)
         if ($LASTEXITCODE -ne 0) {
             throw "git status failed"
         }
+
         return @($output)
     }
     finally {
@@ -122,28 +131,40 @@ function Get-GitPorcelain {
 
 function Assert-CleanWorkingTree {
     param([string]$Root)
+
     if ($AllowDirtyWorkingTree) {
         Write-Log "Skipping clean working tree validation because -AllowDirtyWorkingTree was specified."
         return
     }
 
-    $statusLines = Get-GitPorcelain -Root $Root | Where-Object { $_ -and $_.Trim().Length -gt 0 }
-    if ($statusLines.Count -gt 0) {
+    $statusLines = @(
+        Get-GitPorcelain -Root $Root | Where-Object { $_ -and $_.Trim().Length -gt 0 }
+    )
+
+    if ($statusLines.Length -gt 0) {
         throw "Git working tree is not clean. Commit or stash existing changes first, or rerun with -AllowDirtyWorkingTree."
     }
 }
 
 function Get-ChangedFiles {
     param([string]$Root)
-    $statusLines = Get-GitPorcelain -Root $Root | Where-Object { $_ -and $_.Trim().Length -gt 0 }
+
+    $statusLines = @(
+        Get-GitPorcelain -Root $Root | Where-Object { $_ -and $_.Trim().Length -gt 0 }
+    )
+
     $files = @()
+
     foreach ($line in $statusLines) {
-        $trimmed = $line.Substring(3).Trim()
-        if (-not [string]::IsNullOrWhiteSpace($trimmed)) {
-            $files += $trimmed
+        if ($line.Length -ge 4) {
+            $trimmed = $line.Substring(3).Trim()
+            if (-not [string]::IsNullOrWhiteSpace($trimmed)) {
+                $files += $trimmed
+            }
         }
     }
-    return $files | Sort-Object -Unique
+
+    return @($files | Sort-Object -Unique)
 }
 
 function Stage-And-Commit {
@@ -163,8 +184,8 @@ function Stage-And-Commit {
             }
         }
 
-        $hasStaged = git diff --cached --name-only
-        if (-not $hasStaged) {
+        $hasStaged = @(git diff --cached --name-only)
+        if ($hasStaged.Length -eq 0) {
             Write-Log "No staged changes found. Skipping commit."
             return
         }
@@ -187,11 +208,14 @@ function Stage-And-Commit {
 }
 
 function New-CodexPrompt {
-    param($TasksData, $Task)
+    param(
+        $TasksData,
+        $Task
+    )
 
-    $docs = $TasksData.executionPolicy.readBeforeEachTask -join ", "
-    $criteria = ($Task.acceptanceCriteria | ForEach-Object { "- $_" }) -join "`n"
-    $tests = ($Task.testCommands | ForEach-Object { "- $_" }) -join "`n"
+    $docs = @($TasksData.executionPolicy.readBeforeEachTask) -join ", "
+    $criteria = (@($Task.acceptanceCriteria) | ForEach-Object { "- $_" }) -join "`n"
+    $tests = (@($Task.testCommands) | ForEach-Object { "- $_" }) -join "`n"
 
     return @"
 Read these files before making changes: $docs.
@@ -200,6 +224,7 @@ Execute only task $($Task.id): $($Task.title).
 Do not start any later task.
 Respect clean architecture boundaries exactly as documented.
 Update or add tests required for this task.
+
 Acceptance criteria:
 $criteria
 
@@ -221,8 +246,9 @@ function Invoke-Codex {
     try {
         Write-Log "Invoking Codex CLI for the active task."
         & $Executable $Prompt
+
         if ($LASTEXITCODE -ne 0) {
-            throw "Codex CLI returned exit code $LASTEXITCODE"
+            throw "Codex CLI returned exit code ${LASTEXITCODE}"
         }
     }
     finally {
@@ -236,12 +262,15 @@ function Invoke-TestCommands {
         [string]$WorkingDirectory
     )
 
-    foreach ($command in $Commands) {
-        Invoke-RepoCommand -Command $command -WorkingDirectory $WorkingDirectory
+    foreach ($command in @($Commands)) {
+        if (-not [string]::IsNullOrWhiteSpace($command)) {
+            Invoke-RepoCommand -Command $command -WorkingDirectory $WorkingDirectory
+        }
     }
 }
 
 Ensure-FileExists $TasksFile
+
 Write-Log "Repo root: $RepoRoot"
 Write-Log "Tasks file: $TasksFile"
 Write-Log "Codex executable: $CodexExecutable"
@@ -276,7 +305,7 @@ try {
         Write-Log "Skipping Codex execution because -NoCodex was specified."
     }
 
-    Invoke-TestCommands -Commands $task.testCommands -WorkingDirectory $RepoRoot
+    Invoke-TestCommands -Commands @($task.testCommands) -WorkingDirectory $RepoRoot
 
     $tasksData = Get-TasksData
     $completeNote = "Completed on $(Get-Date -Format s) after verification passed"
@@ -284,12 +313,18 @@ try {
 
     if ($AutoCommit) {
         $changedFiles = @(Get-ChangedFiles -Root $RepoRoot)
+
         if ($changedFiles -notcontains "tools/tasks.json") {
             $changedFiles += "tools/tasks.json"
         }
 
-        if ($changedFiles.Count -gt 0) {
-            Stage-And-Commit -Root $RepoRoot -Files $changedFiles -Message "feat($($task.id.ToLower())): complete $($task.title)" -PushChanges:$Push
+        if ($changedFiles.Length -gt 0) {
+            Stage-And-Commit `
+                -Root $RepoRoot `
+                -Files $changedFiles `
+                -Message "feat($($task.id.ToLower())): complete $($task.title)" `
+                -PushChanges:$Push
+
             Write-Log "Committed verified task changes."
         }
         else {
@@ -302,7 +337,9 @@ try {
 catch {
     $message = $_.Exception.Message
     Write-Log "Verification failed: $message"
+
     $tasksData = Get-TasksData
     Update-Task -TasksData $tasksData -TaskId $task.id -Status "blocked" -Notes "Verification failed: $message"
+
     throw
 }

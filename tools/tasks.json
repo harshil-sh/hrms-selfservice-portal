@@ -35,7 +35,7 @@
     {
       "id": "T001",
       "title": "Initialize backend solution and core projects",
-      "status": "in_progress",
+      "status": "completed",
       "category": "bootstrap",
       "acceptanceCriteria": [
         "Create backend/Hrms.sln",
@@ -47,7 +47,7 @@
         "dotnet restore backend/Hrms.sln",
         "dotnet build backend/Hrms.sln"
       ],
-      "notes": "2026-03-30: Local Windows verification confirms .NET 8 SDK is installed and `dotnet restore backend/Hrms.sln` succeeds. Initial `dotnet build backend/Hrms.sln` failures were `CS0234` in `IApplicationDbContext` (unnecessary EF Core using) and `CS0246` test symbol resolution for `[Fact]`. 2026-03-30: Applied fixes by removing the EF Core using in Application abstraction and adding explicit `using Xunit;` in test files. Re-run local verification to confirm T001 completion; do not mark completed until build passes."
+      "notes": "2026-03-30: Local Windows verification completed for T001. `dotnet restore backend/Hrms.sln` succeeded and `dotnet test backend/Hrms.sln` succeeded with 4/4 tests passing (0 failed). Build completed successfully in the same run, so T001 acceptance criteria are satisfied."
     },
     {
       "id": "T002",
